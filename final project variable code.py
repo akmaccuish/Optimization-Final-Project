@@ -47,6 +47,7 @@ r.addConstrs((ivars.sum(j,'*') <= 40000 for j in warehouses), "Average Inventory
 r.addConstrs((xvars.sum('*',j,t) <= 12000 for j in warehouses for t in years), "Warehouse Flow") # both the flow into a warehouse and the flow out of a warehouse should not exceed an average of 1000 units per month
 r.addConstrs((yvars.sum(j,'*',t) <= 12000 for j in warehouses for t in years), "Warehouse Flow") # both the flow into a warehouse and the flow out of a warehouse should not exceed an average of 1000 units per month
 r.addConstrs((ivars[j][0] = 0 for j in warehouses), 'Year 0 Inventory')
+r.addConstrs((ivars[j][10] = 0 for j in warehouses), 'Year 10 Inventory')
 r.addConstrs((ivars[j][11] = 0 for j in warehouses), 'Year 11 Inventory')
 # Demand
 r.addConstrs((yvars.sum('*',k,t) <= demand[k][t] for k in stores for t in years), "Meet Demand")
