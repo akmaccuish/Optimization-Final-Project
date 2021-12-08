@@ -40,17 +40,18 @@ r.addConstrs((fvars[i][t] == 1 - pvars[i][t+1] for i in plants for t in years), 
 r.addConstrs((zvars[i][t] <= pvars[i][t] * capacity[i] for i in plants for t in years), "Plant capacity binary variable")
 r.addConstrs((pvars[j][0] = 0 for j in warehouses), 'Year 0 P variable')
 r.addConstrs((pvars[j][11] = 0 for j in warehouses), 'Year 11 P variable')
+r.addConstrs((gvars[j][0] = 0 for j in warehouses), 'Year 0 G variable')
 # Shipping Cost
 r.addConstrs((xvars.sum(i,'*',t) == zvars[i][t] for i in plants for t in years), "Sum of Products Shipped") # sum of products shipped from each plant in year t equals to the amount of flugels produced by it in year t 
 r.addConstrs((xvars.sum('*',j,t) + ivars[j][t-1] == yvars.sum(j,'*',t) + ivars[j][t] for j in warehouses for t in years), "Sum of Products Recieved at Warehouses") # sum of products received by warehouse j in year t equals to sum of products shipped from warehouse j in year t
 r.addConstrs((ivars.sum(j,'*') <= 40000 for j in warehouses), "Average Inventory") # average inventory in any year to be no more than 4000 items (among all Warehouses)
-r.addConstrs((xvars.sum('*',j,t) <= 12000 for j in warehouses for t in years), "Warehouse Flow") # both the flow into a warehouse and the flow out of a warehouse should not exceed an average of 1000 units per month
-r.addConstrs((yvars.sum(j,'*',t) <= 12000 for j in warehouses for t in years), "Warehouse Flow") # both the flow into a warehouse and the flow out of a warehouse should not exceed an average of 1000 units per month
+r.addConstrs((xvars.sum('*',j,t) <= 12000 for j in warehouses for t in years), "Warehouse Inflow") # both the flow into a warehouse and the flow out of a warehouse should not exceed an average of 1000 units per month
+r.addConstrs((yvars.sum(j,'*',t) <= 12000 for j in warehouses for t in years), "Warehouse Outflow") # both the flow into a warehouse and the flow out of a warehouse should not exceed an average of 1000 units per month
 r.addConstrs((ivars[j][0] = 0 for j in warehouses), 'Year 0 Inventory')
 r.addConstrs((ivars[j][10] = 0 for j in warehouses), 'Year 10 Inventory')
 r.addConstrs((ivars[j][11] = 0 for j in warehouses), 'Year 11 Inventory')
 # Demand
-r.addConstrs((yvars.sum('*',k,t) <= demand[k][t] for k in stores for t in years), "Meet Demand")
+r.addConstrs((yvars.sum('*',k,t) == demand[k][t] for k in stores for t in years), "Meet Demand")
 # Alloy
 r.addConstrs((4.7 * zvars[i][t] <= 60000 for i in plants for t in years), "Pounds of Alloy")
 # Material
@@ -59,7 +60,7 @@ r.addConstrs((lamda2vars[i][t] <= e1vars[i][t] + e2vars[i][t] for i in plants fo
 r.addConstrs((lamda3vars[i][t] <= e2vars[i][t] for i in plants for t in years), "Lamda3")
 r.addConstrs((lamda1vars[i][t] + lamda2vars[i][t] + lamda3vars[i][t] == 1 for i in plants for t in years), "Lamda Sum")
 r.addConstrs((e1vars[i][t] + e2vars[i][t] == 1 for i in plants for t in years), "e1 and e2 value")
-r.addConstrs((((lamda1vars[i][t] + 9000*(lamda2vars[i][t]) + 1000000*(lamda3vars[i][t])) / 3) == zvars[i][t] for i in plants for t in years), "Z value")
+r.addConstrs((((9000*(lamda2vars[i][t]) + 1000000*(lamda3vars[i][t])) / 3) == zvars[i][t] for i in plants for t in years), "Z value")
 
 
 
