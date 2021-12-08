@@ -19,31 +19,34 @@ years = range(year) # t
 r = gp.Model("Model")
 
 # Variables
-zvars = r.addVars(plants, years, vtype=GRB.CONTINUOUS, obj = planttowh, name = "z")
-xvars = r.addVars(plants, warehouses, years, vtype=GRB.CONTINUOUS, obj = planttowh, name = "x")
-yvars = r.addVars(warehouses, stores, years, vtype=GRB.CONTINUOUS, obj=whtocust, name = "y")
-lamda1vars = r.addVars(plants, years, vtype=GRB.CONTINUOUS, obj = planttowh, name = "lamda1")
-lamda2vars = r.addVars(plants, years, vtype=GRB.CONTINUOUS, obj = planttowh, name = "lamda2")
-lamda3vars = r.addVars(plants, years, vtype=GRB.CONTINUOUS, obj = planttowh, name = "lamda3")
-pvars = r.addVars(plants, years, vtype=GRB.CONTINUOUS, obj = fixedcostplant, lb = 0, ub = 1,  name = "pvar")
+zvars = r.addVars(plants, years, vtype=GRB.CONTINUOUS, obj = planttowh, name = "z") # units of Flugels produced by plant i in year t
+xvars = r.addVars(plants, warehouses, years, vtype=GRB.CONTINUOUS, obj = planttowh, name = "x") # units of Flugels shipped from plant i to warehouse j in year t
+yvars = r.addVars(warehouses, stores, years, vtype=GRB.CONTINUOUS, obj=whtocust, name = "y") # units of Flugels shipped from warehouse j to retail center k in year t
+lamda1vars = r.addVars(plants, years, vtype=GRB.CONTINUOUS, obj = planttowh, name = "lamda1") # calculating the weighted units of purchased raw materials of plant i in year t
+lamda2vars = r.addVars(plants, years, vtype=GRB.CONTINUOUS, obj = planttowh, name = "lamda2") # calculating the weighted units of purchased raw materials of plant i in year t
+lamda3vars = r.addVars(plants, years, vtype=GRB.CONTINUOUS, obj = planttowh, name = "lamda3") # calculating the weighted units of purchased raw materials of plant i in year t
+pvars = r.addVars(plants, years, vtype=GRB.CONTINUOUS, obj = fixedcostplant, lb = 0, ub = 1,  name = "pvar") # whether the plant i’s production line is open at the beginning of year t. 1: open, 0: close (binary) 
 e1vars = r.addVars(plants, years, vtype=GRB.CONTINUOUS, obj = fixedcostplant, lb = 0, ub = 1,  name = "e1")
 e2vars = r.addVars(plants, years, vtype=GRB.CONTINUOUS, obj = fixedcostplant, lb = 0, ub = 1,  name = "e2")
-fvars = r.addVars(plants, years, vtype=GRB.CONTINUOUS, obj = sdcost, lb = 0, ub = 1,  name = "fvar")
-gvars = r.addVars(plants, years, vtype=GRB.CONTINUOUS, obj = rocost, lb = 0, ub = 1,  name = "gvar")
-hvars = r.addVars(plants, years, vtype=GRB.CONTINUOUS, obj = conscost, lb = 0, ub = 1,  name = "hvar")
+fvars = r.addVars(plants, years, vtype=GRB.CONTINUOUS, obj = sdcost, lb = 0, ub = 1,  name = "fvar") # whether the production line in the plant i is going to be shut down at the end of year t or not. 1: shut down, 0: close (binary) 
+gvars = r.addVars(plants, years, vtype=GRB.CONTINUOUS, obj = rocost, lb = 0, ub = 1,  name = "gvar") # whether the production line in the plant i in year t is the initial construction year. 1: initial, 0: not initial (binary)
+hvars = r.addVars(plants, years, vtype=GRB.CONTINUOUS, obj = conscost, lb = 0, ub = 1,  name = "hvar") # whether the production line in the plant i was never opened before year t or not. 1: not opened before, 0: opened before (binary) 
 
 # Constraints
+# Plant Cost
 r.addConstrs((gvars[i][t] == 1 - pvars[i][t-1] for i in plants for t in years), "Reopening cost binary variable")
 r.addConstrs((fvars[i][t] == 1 - pvars[i][t+1] for i in plants for t in years), "Shut down cost binary variable")
 r.addConstrs((zvars[i][t] <= pvars[i][t] * capacity[i] for i in plants for t in years), "Plant capacity binary variable")
-
-
-
-
-
-
-
-
+# Shipping Cost
+r.addConstrs((xvars.sum(i,'*',t) == zvars[i][t] for i in plants for t in years), "Sum of Products Shipped") # sum of products shipped from each plant in year t equals to the amount of flugels produced by it in year t 
+r.addConstrs((xvars.sum('*',j,t) == yvars.sum(j,'*',t) for j in warehouses for t in years), "Sum of Products Recieved at Warehouses") # sum of products received by warehouse j in year t equals to sum of products shipped from warehouse j in year t
+r.addConstrs((xvars.sum('*',j,'*') - yvars.sum(j,k,'*') <= 40000 for j in warehouses for k in stores), "Average Inventory") # average inventory in any year to be no more than 4000 items (among all Warehouses)
+r.addConstrs((xvars.sum('*',j,t) <= 12000 for j in warehouses for t in years), "Warehouse Flow") # both the flow into a warehouse and the flow out of a warehouse should not exceed an average of 1000 units per month
+r.addConstrs((yvars.sum(j,'*',t) <= 12000 for j in warehouses for t in years), "Warehouse Flow") # both the flow into a warehouse and the flow out of a warehouse should not exceed an average of 1000 units per month
+# Demand
+r.addConstrs((yvars.sum('*',k,t) <= demand[k][t] for k in stores for t in years), "Meet Demand")
+# Alloy
+r.addConstrs((4.7 * zvars[i][t] <= 60000 for i in plants for t in years), "Pounds of Alloy")
 
 
 
