@@ -85,6 +85,105 @@ dfsdcost = pd.DataFrame(sdcost,columns=[1,2,3,4,5,6,7,8,9,10])
 dfsdcost.index = [1,2,3,4,5]
 dfsdcost
 
+# raw material costs
+# alloy cost
+acost = []
+acostfy = [0.02,0.02,0.02,0.02,0.02]
+for x in acostfy:
+    a = []
+    for t in range(1,11):
+        ac = x*(1+0.03)**(t-1)
+        a.append(ac)
+    acost.append(a)
+
+dfacost = pd.DataFrame(acost,columns=[1,2,3,4,5,6,7,8,9,10])
+dfacost.index = [1,2,3,4,5]
+dfacost
+
+# Widget subassemblies original cost
+wocost = []
+wocostfy = [0.15,0.15,0.15,0.15,0.15]
+for x in wocostfy:
+    wo = []
+    for t in range(1,11):
+        woc = x*(1+0.03)**(t-1)
+        wo.append(woc)
+    wocost.append(wo)
+
+dfwocost = pd.DataFrame(wocost,columns=[1,2,3,4,5,6,7,8,9,10])
+dfwocost.index = [1,2,3,4,5]
+dfwocost
+
+# Widget subassemblies discounted cost
+wdcost = []
+wdcostfy = [0.12,0.12,0.12,0.12,0.12]
+for x in wdcostfy:
+    wd = []
+    for t in range(1,11):
+        wdc = x*(1+0.03)**(t-1)
+        wd.append(wdc)
+    wdcost.append(wd)
+
+dfwdcost = pd.DataFrame(wdcost,columns=[1,2,3,4,5,6,7,8,9,10])
+dfwdcost.index = [1,2,3,4,5]
+dfwdcost
+
+# 3D dictionary for the shipping cost from plants to warehouses
+w1scostfy = [0.12,0.1,0.05,0.06,0.06]
+w2scostfy = [0.13,0.03,0.07,0.03,0.02]
+w3scostfy = [0.08,0.1,0.06,0.07,0.04]
+w4scostfy = [0.05,0.09,0.03,0.07,0.08]
+wscostfy = [w1scostfy,w2scostfy,w3scostfy,w4scostfy]
+wscostfy
+dfwscostfy = pd.DataFrame(wscostfy,columns=[1,2,3,4,5])
+dfwscostfy.index = [1,2,3,4]
+dfwscostfy
+plant = [1,2,3,4,5]
+warehouse = [1,2,3,4]
+year = [1,2,3,4,5,6,7,8,9,10]
+
+Aijt = {}
+for i in plant:
+    Aijt[i]={}
+    for j in warehouse:
+        Aijt[i][j]={}
+        for t in year:
+            Aijt[i][j][t]=dfwscostfy[i][j]*(1+0.03)**(t-1)
+            
+Aijt
+# basically Aijt[2][2][5] means the shipping cost of shipping products from plant 2 to warehouse 2 in year 5   
+
+
+# 3D dictionary for the shipping cost from warehouses to retail centers
+r1scostfy = [0.09,0.05,0.06,0.07]
+r2scostfy = [0.1,0.07,0.09,0.08]
+r3scostfy = [0.06,0.12,0.07,0.09]
+r4scostfy = [0.05,0.04,0.09,0.06]
+r5scostfy = [0.08,0.03,0.09,0.1]
+r6scostfy = [0.09,0.09,0.04,0.07]
+r7scostfy = [0.02,0.03,0.11,0.06]
+r8scostfy = [0.12,0.08,0.07,0.09]
+rscostfy = [r1scostfy,r2scostfy,r3scostfy,r4scostfy,r5scostfy,r6scostfy,r7scostfy,r8scostfy]
+dfrscostfy = pd.DataFrame(rscostfy,columns=[1,2,3,4])
+dfrscostfy.index = [1,2,3,4,5,6,7,8]
+dfrscostfy
+warehouse = [1,2,3,4]
+retail = [1,2,3,4,5,6,7,8]
+year = [1,2,3,4,5,6,7,8,9,10]
+
+Bjkt = {}
+for j in warehouse:
+    Bjkt[j]={}
+    for k in retail:
+        Bjkt[j][k]={}
+        for t in year:
+            Bjkt[j][k][t]=dfrscostfy[j][k]*(1+0.03)**(t-1)    
+
+Bjkt
+# basically Bjkt[1][2][2] means the shipping cost of shipping products from warehouse 1 to retail center 2 in year 2   
+
+
+'''
 # dataframes for warehouse shipping costs
 # warehouse 1
 w1scost = []
@@ -254,46 +353,4 @@ for x in r8scostfy:
 dfr8scost = pd.DataFrame(r8scost,columns=[1,2,3,4,5,6,7,8,9,10])
 dfr8scost.index = [1,2,3,4]
 dfr8scost
-
-# raw material costs
-# alloy cost
-acost = []
-acostfy = [0.02,0.02,0.02,0.02,0.02]
-for x in acostfy:
-    a = []
-    for t in range(1,11):
-        ac = x*(1+0.03)**(t-1)
-        a.append(ac)
-    acost.append(a)
-
-dfacost = pd.DataFrame(acost,columns=[1,2,3,4,5,6,7,8,9,10])
-dfacost.index = [1,2,3,4,5]
-dfacost
-
-# Widget subassemblies original cost
-wocost = []
-wocostfy = [0.15,0.15,0.15,0.15,0.15]
-for x in wocostfy:
-    wo = []
-    for t in range(1,11):
-        woc = x*(1+0.03)**(t-1)
-        wo.append(woc)
-    wocost.append(wo)
-
-dfwocost = pd.DataFrame(wocost,columns=[1,2,3,4,5,6,7,8,9,10])
-dfwocost.index = [1,2,3,4,5]
-dfwocost
-
-# Widget subassemblies discounted cost
-wdcost = []
-wdcostfy = [0.12,0.12,0.12,0.12,0.12]
-for x in wdcostfy:
-    wd = []
-    for t in range(1,11):
-        wdc = x*(1+0.03)**(t-1)
-        wd.append(wdc)
-    wdcost.append(wd)
-
-dfwdcost = pd.DataFrame(wdcost,columns=[1,2,3,4,5,6,7,8,9,10])
-dfwdcost.index = [1,2,3,4,5]
-dfwdcost
+'''
