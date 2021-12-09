@@ -230,7 +230,7 @@ hvars = r.addVars(plants, years, vtype=GRB.CONTINUOUS, lb = 0, ub = 1,  name = "
 r.addConstrs((gvars[i,t] == 1 - pvars[i,t-1] for i in plants for t in year), "Reopening cost binary variable")
 r.addConstrs((fvars[i,t] == 1 - pvars[i,t+1] for i in plants for t in year), "Shut down cost binary variable")
 r.addConstrs((zvars[i,t] <= pvars[i,t] * capacity[i-1] for i in plants for t in year), "Plant capacity binary variable")
-.addConstrs((pvars[i,0] == 0 for i in plants), 'Year 0 P variable')
+r.addConstrs((pvars[i,0] == 0 for i in plants), 'Year 0 P variable')
 r.addConstrs((pvars[i,11] == 0 for i in plants), 'Year 11 P variable')
 r.addConstrs((gvars[i,0] == 0 for i in plants), 'Year 0 G variable')
 r.addConstrs((hvars[i,1] == 1 for i in plants), 'Year 1 H variable')
