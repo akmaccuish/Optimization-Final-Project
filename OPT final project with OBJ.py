@@ -348,42 +348,39 @@ print('\nTotal Costs: %g' % r.objVal)
 # Cost per year -- is there a way we can do this with our current objective value format?
 
 # Plants to warehouses
-'''print('SOLUTION:')
+print('SOLUTION:')
 for i in plants:
-    if pvars[i,t].x > 0.99:
-        print('Plant %d open in year %d' % ((i+1), (t+1)))
-        for j in warehouses:
-            for t in years:
+    for j in warehouses:
+        for t in years:
+            if pvars[i,t].x > 0.99:
+                print('Plant %d open in year %d' % (i,t))
                 if xvars[i,j,t].x > 0:
-                    print('Transport %d units to warehouse %d in year %d' % ((xvars[i,j,t].x, (j+1),(t+1))))
-    else:
-        print('Plant %s closed in year %d' % ((i+1),(t+1)))'''
-        
+                    print('Plant %d will transport %d units to warehouse %d in year %d' % ((i, xvars[i,j,t].x, j,t)))
+            else:
+                print('Plant %s closed in year %d' % ((i,t)))
 
 ## Warehouses to retail centers
 for j in warehouses:
         for k in stores:
             for t in year:
                 if yvars[j,k,t].x > 0:
-                    print('Transport %d Flugels to retail center %d in year %d' % ((yvars[j,k,t].x), (k), (t)))
+                    print('Warehouse %d will transport %d Flugels to retail center %d in year %d' % (j,(yvars[j,k,t].x), k, t))
                 else:
-                    print('Warehouse %d will ship 0 units to retail center %d in year %d' % ((j),(k),(t)))
+                    print('Warehouse %d will transport 0 Flugels to retail center %d in year %d' % (j,k,t))
 
 
 # Flugels produced (zvars)
-'''for i in plants:
-    for j in warehouses:
-        for t in years:
-            if zvars[i,j,t].x > 0:
-                print('Plant %d will produce %d units in year %d' % 
-                      ((i+1), (zvars[i,j,t].x),(t+1)))'''
+for i in plants:
+    for t in years:
+        if zvars[(i,t)].x > 0:
+            print('Plant %d will produce %d units in year %d' % (i, (zvars[i,t].x),(t)))
           
     
 # Units of inventory stored in each warehouse each year (ivars)
 for j in warehouses:
     for t in year:
-        if ivars[j,t].x > 0:
-            print('Warehouse %d will have %d units of inventory in year %d' % ((j), (ivars[j,t].x), (t)))
+        if ivars[(j,t)].x > 0:
+            print('Warehouse %d will have %d units of inventory in year %d' % (j, (ivars[j,t].x), t))
 
         
 # plant shutdown (fvars)
