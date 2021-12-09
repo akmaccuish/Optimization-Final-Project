@@ -31,7 +31,7 @@ for j in warehouses:
                 if yvars[j,k,t].x > 0:
                     print('Transport %d Flugels to retail center %d in year %d' % ((yvars[j,k,t].x), (k+1), (t+1)))
                 else:
-                    print('Warehouse %d will ship 0 units to retail center %d in year %d' % ((j+1),(k+1),(t+1))
+                    print('Warehouse %d will ship 0 units to retail center %d in year %d' % ((j+1),(k+1),(t+1)))
 
 
 # Flugels produced (zvars)
