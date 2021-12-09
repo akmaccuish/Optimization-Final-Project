@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # -*- coding: utf-8 -*-
 """
 Created on Thu Dec  9 00:07:29 2021
@@ -32,7 +31,7 @@ for j in warehouses:
                 if yvars[j,k,t].x > 0:
                     print('Transport %d Flugels to retail center %d in year %d' % ((yvars[j,k,t].x), (k+1), (t+1)))
                 else:
-                    print('Warehouse %d will ship 0 units to retail center %d in year %d' % (j+1))
+                    print('Warehouse %d will ship 0 units to retail center %d in year %d' % ((j+1),(k+1),(t+1))
 
 
 # Flugels produced (zvars)
@@ -67,6 +66,9 @@ for i in plants:
             print('Plant %d will reopen in the beginning of year %d' % ((i+1),(t+1)))
 
 # plant construction (hvars)
-
+for i in plants:
+    for t in years:
+        if hvars[i][t] > 0.99:
+            print('Plant %d will be constructed in the beginning of year %d' % ((i+1),(t+1)))
 
 
