@@ -230,33 +230,33 @@ hvars = r.addVars(plants, years, vtype=GRB.CONTINUOUS, lb = 0, ub = 1,  name = "
 
 # Constraints
 # Plant Cost
-r.addConstrs((gvars[i,t] == 1 - pvars[i,t-1] for i in plants for t in year), "Reopening cost binary variable")
-r.addConstrs((fvars[i,t] == 1 - pvars[i,t+1] for i in plants for t in year), "Shut down cost binary variable")
-r.addConstrs((zvars[i,t] <= pvars[i,t] * capacity[i-1] for i in plants for t in year), "Plant capacity binary variable")
-r.addConstrs((pvars[i,0] == 0 for i in plants), 'Year 0 P variable')
-r.addConstrs((pvars[i,11] == 0 for i in plants), 'Year 11 P variable')
-r.addConstrs((gvars[i,0] == 0 for i in plants), 'Year 0 G variable')
-r.addConstrs((hvars[i,0] == 0 for i in plants), 'Year 1 H variable')
+r.addConstrs((gvars[i,t] == 1 - pvars[i,t-1] for i in plants for t in year), "Reopening_cost_binary_variable")
+r.addConstrs((fvars[i,t] == 1 - pvars[i,t+1] for i in plants for t in year), "Shut_down_cost_binary_variable")
+r.addConstrs((zvars[i,t] <= pvars[i,t] * capacity[i-1] for i in plants for t in year), "Plant_capacity_binary_variable")
+r.addConstrs((pvars[i,0] == 0 for i in plants), 'Year_0_P_variable')
+r.addConstrs((pvars[i,11] == 0 for i in plants), 'Year_11_P_variable')
+r.addConstrs((gvars[i,0] == 0 for i in plants), 'Year_0_G_variable')
+r.addConstrs((hvars[i,0] == 0 for i in plants), 'Year_1_H_variable')
 # Shipping Cost
-r.addConstrs((xvars.sum(i,'*',t) == zvars[i,t] for i in plants for t in year), "Sum of Products Shipped") # sum of products shipped from each plant in year t equals to the amount of flugels produced by it in year t 
-r.addConstrs((xvars.sum('*',j,t) + ivars[j,t-1] == yvars.sum(j,'*',t) + ivars[j,t] for j in warehouses for t in year), "Sum of Products Recieved at Warehouses") # sum of products received by warehouse j in year t equals to sum of products shipped from warehouse j in year t
-r.addConstrs((ivars.sum(j,'*') <= 40000 for j in warehouses), "Average Inventory") # average inventory in any year to be no more than 4000 items (among all Warehouses)
-r.addConstrs((xvars.sum('*',j,t) <= 12000 for j in warehouses for t in year), "Warehouse Inflow") # both the flow into a warehouse and the flow out of a warehouse should not exceed an average of 1000 units per month
-r.addConstrs((yvars.sum(j,'*',t) <= 12000 for j in warehouses for t in year), "Warehouse Outflow") # both the flow into a warehouse and the flow out of a warehouse should not exceed an average of 1000 units per month
-r.addConstrs((ivars[j,0] == 0 for j in warehouses), 'Year 0 Inventory')
-r.addConstrs((ivars[j,10] == 0 for j in warehouses), 'Year 10 Inventory')
-r.addConstrs((ivars[j,11] == 0 for j in warehouses), 'Year 11 Inventory')
+r.addConstrs((xvars.sum(i,'*',t) == zvars[i,t] for i in plants for t in year), "Sum_of_Products_Shipped") # sum of products shipped from each plant in year t equals to the amount of flugels produced by it in year t 
+r.addConstrs((xvars.sum('*',j,t) + ivars[j,t-1] == yvars.sum(j,'*',t) + ivars[j,t] for j in warehouses for t in year), "Sum_of_Products_Recieved_at_Warehouses") # sum of products received by warehouse j in year t equals to sum of products shipped from warehouse j in year t
+r.addConstrs((ivars.sum(j,'*') <= 40000 for j in warehouses), "Average_Inventory") # average inventory in any year to be no more than 4000 items (among all Warehouses)
+r.addConstrs((xvars.sum('*',j,t) <= 12000 for j in warehouses for t in year), "Warehouse_Inflow") # both the flow into a warehouse and the flow out of a warehouse should not exceed an average of 1000 units per month
+r.addConstrs((yvars.sum(j,'*',t) <= 12000 for j in warehouses for t in year), "Warehouse_Outflow") # both the flow into a warehouse and the flow out of a warehouse should not exceed an average of 1000 units per month
+r.addConstrs((ivars[j,0] == 0 for j in warehouses), 'Year_0_Inventory')
+r.addConstrs((ivars[j,10] == 0 for j in warehouses), 'Year_10_Inventory')
+r.addConstrs((ivars[j,11] == 0 for j in warehouses), 'Year_11_Inventory')
 # Demand
-r.addConstrs((yvars.sum('*',k,t) == demand[k][t] for k in stores for t in year), "Meet Demand")
+r.addConstrs((yvars.sum('*',k,t) == demand[k][t] for k in stores for t in year), "Meet_Demand")
 # Alloy
-r.addConstrs((4.7 * zvars[i,t] <= 60000 for i in plants for t in year), "Pounds of Alloy")
+r.addConstrs((4.7 * zvars[i,t] <= 60000 for i in plants for t in year), "Pounds_of_Alloy")
 # Material
 r.addConstrs((lamda1vars[i,t] <= e1vars[i,t] for i in plants for t in year), "Lamda1")
 r.addConstrs((lamda2vars[i,t] <= e1vars[i,t] + e2vars[i,t] for i in plants for t in year), "Lamda2")
 r.addConstrs((lamda3vars[i,t] <= e2vars[i,t] for i in plants for t in year), "Lamda3")
-r.addConstrs((lamda1vars[i,t] + lamda2vars[i,t] + lamda3vars[i,t] == 1 for i in plants for t in year), "Lamda Sum")
-r.addConstrs((e1vars[i,t] + e2vars[i,t] == 1 for i in plants for t in year), "e1 and e2 value")
-r.addConstrs((((9000*(lamda2vars[i,t]) + 1000000*(lamda3vars[i,t])) / 3) == zvars[i,t] for i in plants for t in year), "Z value")
+r.addConstrs((lamda1vars[i,t] + lamda2vars[i,t] + lamda3vars[i,t] == 1 for i in plants for t in year), "Lamda_Sum")
+r.addConstrs((e1vars[i,t] + e2vars[i,t] == 1 for i in plants for t in year), "e1_and_e2_value")
+r.addConstrs((((9000*(lamda2vars[i,t]) + 1000000*(lamda3vars[i,t])) / 3) == zvars[i,t] for i in plants for t in year), "Z_value")
 
 # Optimize Model
 #r.optimize()
@@ -351,13 +351,18 @@ print('\nTotal Costs: %g' % r.objVal)
 print('SOLUTION:')
 for i in plants:
     for j in warehouses:
-        for t in years:
+        for t in year:
             if pvars[i,t].x > 0.99:
-                print('Plant %d open in year %d' % (i,t))
                 if xvars[i,j,t].x > 0:
                     print('Plant %d will transport %d units to warehouse %d in year %d' % ((i, xvars[i,j,t].x, j,t)))
-            else:
-                print('Plant %s closed in year %d' % ((i,t)))
+# pvars
+for i in plants:
+    for t in year:
+        if pvars[i,t].x > 0.99:
+            print('Plant %d will be open in year %d' % (i,t))
+        else:
+            print('Plant %s closed in year %d' % ((i,t)))
+
 
 ## Warehouses to retail centers
 for j in warehouses:
@@ -371,7 +376,7 @@ for j in warehouses:
 
 # Flugels produced (zvars)
 for i in plants:
-    for t in years:
+    for t in year:
         if zvars[(i,t)].x > 0:
             print('Plant %d will produce %d units in year %d' % (i, (zvars[i,t].x),(t)))
           
@@ -400,4 +405,13 @@ for i in plants:
     for t in year:
         if hvars[(i,t)].x > 0.99:
             print('Plant %d will be constructed in the beginning of year %d' % (i,t))
+
+r.write('xyz.lp')
+
+# print our objective function
+# print(r.getObjective())
+
+
+
+
 
