@@ -15,7 +15,6 @@ print('SOLUTION:')
 for i in plants:
     if pvars[i,t].x > 0.99:
         print('Plant %d open in year %d' % ((i+1), (t+1)))
-        # do we also want to track other binary variables, or just use those for our costs?
         for j in warehouses:
             for t in years:
                 if xvars[i,j,t].x > 0:
