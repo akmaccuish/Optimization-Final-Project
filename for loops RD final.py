@@ -4,7 +4,6 @@ Created on Thu Dec  9 00:07:29 2021
 
 @author: acmcn
 """
-#printSolution()
 # Objective Function Value
 print('\nTotal Costs: %g' % r.objVal)
 
@@ -49,8 +48,6 @@ for j in warehouses:
             print('Warehouse %d will have %d units of inventory in year %d' % ((j+1),
             (ivars[j][t].x), (t+1)))
 
-
-# are we tracking the number of materials to purchase in each year?
         
 # plant shutdown (fvars)
 for i in plants:
