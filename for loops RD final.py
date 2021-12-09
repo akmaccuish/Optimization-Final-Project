@@ -12,14 +12,14 @@ print('\nTotal Costs: %g' % r.objVal)
 # Plants to warehouses
 print('SOLUTION:')
 for i in plants:
-    if pvars[i,t].x > 0.99:
-        print('Plant %d open in year %d' % ((i+1), (t+1)))
-        for j in warehouses:
-            for t in years:
+    for j in warehouses:
+        for t in years:
+            if pvars[i,t].x > 0.99:
+                print('Plant %d open in year %d' % ((i+1), (t+1)))
                 if xvars[i,j,t].x > 0:
                     print('Transport %d units to warehouse %d in year %d' % ((xvars[i,j,t].x, (j+1),(t+1))))
-    else:
-        print('Plant %s closed in year %d' % ((i+1),(t+1)))
+            else:
+                print('Plant %s closed in year %d' % ((i+1),(t+1)))
         
 
 ## Warehouses to retail centers
