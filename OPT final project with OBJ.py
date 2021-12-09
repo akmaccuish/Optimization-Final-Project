@@ -9,6 +9,8 @@ from gurobipy import GRB
 
 import pandas as pd
 
+
+
 plant_l = [1,2,3,4,5]
 retail_l = [1,2,3,4,5,6,7,8]
 year_l = [0,1,2,3,4,5,6,7,8,9,10,11]
@@ -207,6 +209,7 @@ year = [1,2,3,4,5,6,7,8,9,10]
 
 capacity = [16000,12000,14000,10000,13000]
 r = gp.Model("Model")
+r.params.NonConvex = 2
 
 # Variables
 zvars = r.addVars(plants, years, vtype=GRB.CONTINUOUS, name = "z") # units of Flugels produced by plant i in year t
@@ -233,7 +236,7 @@ r.addConstrs((zvars[i,t] <= pvars[i,t] * capacity[i-1] for i in plants for t in 
 r.addConstrs((pvars[i,0] == 0 for i in plants), 'Year 0 P variable')
 r.addConstrs((pvars[i,11] == 0 for i in plants), 'Year 11 P variable')
 r.addConstrs((gvars[i,0] == 0 for i in plants), 'Year 0 G variable')
-r.addConstrs((hvars[i,1] == 1 for i in plants), 'Year 1 H variable')
+r.addConstrs((hvars[i,0] == 0 for i in plants), 'Year 1 H variable')
 # Shipping Cost
 r.addConstrs((xvars.sum(i,'*',t) == zvars[i,t] for i in plants for t in year), "Sum of Products Shipped") # sum of products shipped from each plant in year t equals to the amount of flugels produced by it in year t 
 r.addConstrs((xvars.sum('*',j,t) + ivars[j,t-1] == yvars.sum(j,'*',t) + ivars[j,t] for j in warehouses for t in year), "Sum of Products Recieved at Warehouses") # sum of products received by warehouse j in year t equals to sum of products shipped from warehouse j in year t
@@ -342,5 +345,62 @@ r.optimize()
 # Objective Function Value
 print('\nTotal Costs: %g' % r.objVal)
 
+# Cost per year -- is there a way we can do this with our current objective value format?
 
+# Plants to warehouses
+'''print('SOLUTION:')
+for i in plants:
+    if pvars[i,t].x > 0.99:
+        print('Plant %d open in year %d' % ((i+1), (t+1)))
+        for j in warehouses:
+            for t in years:
+                if xvars[i,j,t].x > 0:
+                    print('Transport %d units to warehouse %d in year %d' % ((xvars[i,j,t].x, (j+1),(t+1))))
+    else:
+        print('Plant %s closed in year %d' % ((i+1),(t+1)))'''
+        
+
+## Warehouses to retail centers
+for j in warehouses:
+        for k in stores:
+            for t in year:
+                if yvars[j,k,t].x > 0:
+                    print('Transport %d Flugels to retail center %d in year %d' % ((yvars[j,k,t].x), (k), (t)))
+                else:
+                    print('Warehouse %d will ship 0 units to retail center %d in year %d' % ((j),(k),(t)))
+
+
+# Flugels produced (zvars)
+'''for i in plants:
+    for j in warehouses:
+        for t in years:
+            if zvars[i,j,t].x > 0:
+                print('Plant %d will produce %d units in year %d' % 
+                      ((i+1), (zvars[i,j,t].x),(t+1)))'''
+          
+    
+# Units of inventory stored in each warehouse each year (ivars)
+for j in warehouses:
+    for t in year:
+        if ivars[j,t].x > 0:
+            print('Warehouse %d will have %d units of inventory in year %d' % ((j), (ivars[j,t].x), (t)))
+
+        
+# plant shutdown (fvars)
+for i in plants:
+    for t in year:
+        if fvars[i,t] > 0.99:
+            print('Plant %d will shutdown in the end of year %d' % ((i),(t)))
+
+# plant reopening (gvars)
+for i in plants:
+    for t in year:
+        if gvars[i,t] > 0.99:
+            print('Plant %d will reopen in the beginning of year %d' % ((i),(t)))
+
+# plant construction (hvars)
+for i in plants:
+    for t in year:
+        if hvars[i,t] > 0.99:
+            print('Plant %d will be constructed in the beginning of year %d' % ((i),(t)))
 
