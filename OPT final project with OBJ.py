@@ -389,18 +389,18 @@ for j in warehouses:
 # plant shutdown (fvars)
 for i in plants:
     for t in year:
-        if fvars[i,t] > 0.99:
-            print('Plant %d will shutdown in the end of year %d' % ((i),(t)))
+        if fvars[(i,t)].x > 0.99:
+            print('Plant %d will shutdown in the end of year %d' % (i,t))
 
 # plant reopening (gvars)
 for i in plants:
     for t in year:
-        if gvars[i,t] > 0.99:
-            print('Plant %d will reopen in the beginning of year %d' % ((i),(t)))
+        if gvars[(i,t)].x > 0.99:
+            print('Plant %d will reopen in the beginning of year %d' % (i,t))
 
 # plant construction (hvars)
 for i in plants:
     for t in year:
-        if hvars[i,t] > 0.99:
-            print('Plant %d will be constructed in the beginning of year %d' % ((i),(t)))
+        if hvars[(i,t)].x > 0.99:
+            print('Plant %d will be constructed in the beginning of year %d' % (i,t))
 
